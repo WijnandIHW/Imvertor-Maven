@@ -12,7 +12,7 @@
 	
 	<!--xsl:include href="Documentation.xsl"/--> 
 	
-	<xsl:variable name="stylesheet-code" as="xs:string">YAMLB</xsl:variable>
+	<xsl:variable name="stylesheet-code" as="xs:string">YAMLM</xsl:variable>
 	
 	<!-- The first variable is meant for the server environment, the second one is used during development in XML-Spy. -->
 	<xsl:variable name="debugging" select="imf:debug-mode($stylesheet-code)" as="xs:boolean"/>
@@ -219,6 +219,22 @@
 							/ep:*/ep:construct/ep:type-name 
 							and 
 							not( ep:enum )
+							and
+							not(
+							ep:tech-name = //ep:message
+							[
+							(
+							contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Gr') 
+							or
+							contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Gc') 
+							)
+							and 
+							ep:parameters/ep:parameter[ep:name='messagetype']/ep:value = 'response'
+							]
+							/ep:*/ep:construct/ep:type-name 
+							and 
+							not( ep:enum )
+							)
 							]">
 							<xsl:sort select="ep:tech-name" order="ascending"/>
 	
@@ -1848,7 +1864,7 @@
 				<xsl:sequence select="imf:generateDebugInfo('Debuglocatie-04500',.)"/>
 				
 				<j:string key="type">array</j:string>
-				<j:map key="item">
+				<j:map key="items">
 					<xsl:sequence select="imf:generateRef(concat($json-topstructure,'/', $typeName))"/>
 				</j:map>
 			</xsl:when>
@@ -2512,9 +2528,10 @@
 		<xsl:param name="contextItem"/>		
 		
 		<xsl:if test="$debugging">
-			<j:map key="{concat('--------------',$debugId,'--------------',generate-id($contextItem))}">
-				<j:string key="XPath"><xsl:sequence select="imf:xpath-string($contextItem)"/></j:string>
-			</j:map>
+			<xsl:comment>
+				<xsl:value-of select="concat('--------------',$debugId,'--------------',generate-id($contextItem))"/><xsl:text>
+</xsl:text><xsl:value-of select="concat('XPath',imf:xpath-string($contextItem))"/>
+			</xsl:comment>
 		</xsl:if>
 		
 	</xsl:function>
