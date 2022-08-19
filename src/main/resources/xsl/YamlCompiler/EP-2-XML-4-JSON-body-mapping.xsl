@@ -105,17 +105,15 @@
 				<xsl:choose>
 					<xsl:when test="$serialisation = 'hal+json'">
 						<!-- Only if hal+json applies this when is relevant -->
-						<!-- In case of Gr or Gc messages HalCollectie and Hal entities have to be generated. -->
-						<!-- Loop over global constructs which are refered to from constructs directly within the (collection) ep:message 
+						<!-- In case of Gc messages HalCollectie entities have to be generated. -->
+						<!-- Loop over global constructs which are refered to from constructs directly within the collection ep:message 
 						 elements (the top-level classes). So enumeration constructs and group constructs are not included.
-						 In case of hal+json serialisation for-each of those entities an '[eniteitnaam]Hal' component has to be created. -->
+						 In case of hal+json serialisation for-each of those entities an '[eniteitnaam]HalCollectie' component has to be created. -->
 						<xsl:for-each select="ep:message-set/ep:construct
 							[ 
 							ep:tech-name = //ep:message
 							[
 							(
-							contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Gr') 
-							or
 							contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Gc') 
 							)
 							and 
@@ -131,60 +129,51 @@
 							<xsl:variable name="elementName" select="translate(ep:tech-name,'.','_')"/>
 							
 							<!-- If the class is a construct for a Gc message a HalCollectie component is created. -->
-							<xsl:if test="contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Gc')">
-								<xsl:variable name="tech-name" select="ep:tech-name"/>
-								<xsl:variable name="pagination" select="//ep:message
-									[
-									contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Gc') 
-									and 
-									ep:parameters/ep:parameter[ep:name='messagetype']/ep:value = 'response'
-									and
-									ep:*/ep:construct/ep:type-name = $tech-name
-									]
-									/ep:parameters/ep:parameter[ep:name='pagination']/ep:value"/>
-								
-								
-								<j:map key="{concat($tech-name,'HalCollectie')}">
-									<j:string key="type">object</j:string>
-									<j:map key="properties">
-										<j:map key="_links">	
-											<xsl:choose>
-												<xsl:when test="$pagination='true'">
-													<xsl:sequence select="imf:generateRef(concat($standard-json-components-url,'HalPaginationLinks'))"/>
-												</xsl:when>
-												<xsl:otherwise>
-													<xsl:sequence select="imf:generateRef(concat($standard-json-components-url,'HalCollectionLinks'))"/>
-												</xsl:otherwise>
-											</xsl:choose>
-										</j:map>
-										<j:map key="_embedded">
-											<j:string key="type">object</j:string>
-											<j:map key="properties">
-												<j:map key="{ep:parameters/ep:parameter[ep:name='meervoudigeNaam']/ep:value}">
-													<j:string key="type">array</j:string>
-													<j:map key="items">
-														<xsl:sequence select="imf:generateRef(concat($json-topstructure,'/',translate($tech-name,'.','_'),'Hal'))"/>
-													</j:map>
-												</j:map>																									
-											</j:map>												
-										</j:map>
-									</j:map>
-								</j:map>
-								
-							</xsl:if>							
-	
 							<xsl:sequence select="imf:generateDebugInfo('Debuglocatie-01000',.)"/>
 
-							<!-- The regular constructs are generated here. -->
+							<xsl:variable name="tech-name" select="ep:tech-name"/>
+							<xsl:variable name="pagination" select="//ep:message
+								[
+								contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Gc') 
+								and 
+								ep:parameters/ep:parameter[ep:name='messagetype']/ep:value = 'response'
+								and
+								ep:*/ep:construct/ep:type-name = $tech-name
+								]
+								/ep:parameters/ep:parameter[ep:name='pagination']/ep:value"/>
 							
-							<xsl:sequence select="imf:createHalComponent($elementName,.)"/>
 							
-							<xsl:variable name="construct">
-								<xsl:call-template name="construct"/>
-							</xsl:variable>
-							<xsl:sequence select="$construct"/>
+							<j:map key="{concat($tech-name,'HalCollectie')}">
+								<j:string key="type">object</j:string>
+								<j:map key="properties">
+									<j:map key="_links">	
+										<xsl:choose>
+											<xsl:when test="$pagination='true'">
+												<xsl:sequence select="imf:generateRef(concat($standard-json-components-url,'HalPaginationLinks'))"/>
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:sequence select="imf:generateRef(concat($standard-json-components-url,'HalCollectionLinks'))"/>
+											</xsl:otherwise>
+										</xsl:choose>
+									</j:map>
+									<j:map key="_embedded">
+										<j:string key="type">object</j:string>
+										<j:map key="properties">
+											<j:map key="{ep:parameters/ep:parameter[ep:name='meervoudigeNaam']/ep:value}">
+												<j:string key="type">array</j:string>
+												<j:map key="items">
+													<xsl:sequence select="imf:generateRef(concat($json-topstructure,'/',translate($tech-name,'.','_'),'Hal'))"/>
+												</j:map>
+											</j:map>																									
+										</j:map>												
+									</j:map>
+								</j:map>
+							</j:map>
 						</xsl:for-each>
-						<!-- In case of Pa, Po or Pu messages only Hal entities have to be generated. -->
+						<!-- In case of Gr, Gc, Pa, Po or Pu messages Hal entities have to be generated. -->
+						<!-- Loop over global constructs which are refered to from constructs directly within the ep:message 
+						 elements (the top-level classes). So enumeration constructs and group constructs are not included.
+						 In case of hal+json serialisation for-each of those entities an '[eniteitnaam]Hal' component has to be created. -->
 						<xsl:for-each select="ep:message-set/ep:construct
 							[ 
 							ep:tech-name = //ep:message
@@ -192,6 +181,10 @@
 							(
 							(
 							(
+							contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Gr') 
+							or
+							contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Gc')
+							or
 							contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Pa') 
 							or
 							contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Po') 
@@ -219,26 +212,9 @@
 							/ep:*/ep:construct/ep:type-name 
 							and 
 							not( ep:enum )
-							and
-							not(
-							ep:tech-name = //ep:message
-							[
-							(
-							contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Gr') 
-							or
-							contains( ep:parameters/ep:parameter[ep:name='berichtcode']/ep:value,'Gc') 
-							)
-							and 
-							ep:parameters/ep:parameter[ep:name='messagetype']/ep:value = 'response'
-							]
-							/ep:*/ep:construct/ep:type-name 
-							and 
-							not( ep:enum )
-							)
 							]">
 							<xsl:sort select="ep:tech-name" order="ascending"/>
 	
-							<xsl:variable name="type-name" select="ep:type-name"/>
 							<xsl:variable name="elementName" select="translate(ep:tech-name,'.','_')"/>
 	
 							<xsl:sequence select="imf:generateDebugInfo('Debuglocatie-01100',.)"/>
@@ -299,7 +275,6 @@
 							not( ep:enum )
 							]">
 							<xsl:sort select="ep:tech-name" order="ascending"/>
-							<xsl:variable name="type-name" select="ep:type-name"/>
 							<!-- The regular constructs are generated here. -->
 
 							<xsl:sequence select="imf:generateDebugInfo('Debuglocatie-01300',.)"/>
@@ -1511,9 +1486,9 @@
 						<xsl:apply-templates select="ep:documentation"/>
 					</xsl:if>
 					<xsl:choose>
-						<!-- If the content of all ep:name elements is equal to their sibbling ep:alias elements no further documentation is generated. -->
-						<xsl:when test="count(ep:enum[ep:name=ep:alias])=count(ep:enum)"/>
-						<xsl:when test="//ep:p/@format = 'markdown'">
+						<!-- If the content of all ep:name elements is equal to their sibbling ep:alias elements and no ep:enum element has documentation no further documentation is generated. -->
+						<xsl:when test="count(ep:enum[ep:name=ep:alias])=count(ep:enum) and empty(ep:enum/ep:documentation)"/>
+<!--						<xsl:when test="count(ep:enum[ep:name=ep:alias])=count(ep:enum) and //ep:p/@format = 'markdown'">
 							<xsl:text>&lt;body&gt;&lt;ul&gt;</xsl:text>
 							<xsl:for-each select="ep:enum">
 								<xsl:text>&lt;li&gt;</xsl:text><xsl:value-of select="concat('`',ep:alias,'` - ',ep:documentation)"/><xsl:text>&lt;/li&gt;</xsl:text>
@@ -1531,7 +1506,7 @@
 							<xsl:for-each select="ep:enum">
 								<xsl:value-of select="concat('\n* `',ep:alias,'` - ',ep:documentation)"/>
 							</xsl:for-each>
-						</xsl:when>
+						</xsl:when> -->
 						<xsl:otherwise>
 							<xsl:for-each select="ep:enum">
 								<xsl:value-of select="concat('\n* `',ep:alias,'` - ',ep:name,' ',ep:documentation)"/>

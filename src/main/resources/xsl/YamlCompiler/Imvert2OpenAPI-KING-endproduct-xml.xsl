@@ -44,14 +44,29 @@
 
 	<xsl:variable name="messages" select="imf:document($processable-base-file)" />
 	<xsl:variable name="packages" select="$messages/imvert:packages" />
-
+	<xsl:variable name="description-level">
+		<xsl:choose>
+			<xsl:when test="empty(imf:get-tagged-value($packages,'##CFG-TV-INSERTDESCRIPTIONFROM'))">
+				<xsl:value-of select="'SIM'"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="imf:get-tagged-value($packages,'##CFG-TV-INSERTDESCRIPTIONFROM')"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
 	<xsl:variable name="kv-prefix" select="imf:get-tagged-value($packages,'##CFG-TV-VERKORTEALIAS')"/>
 	<xsl:variable name="kv-definition">
+		<xsl:variable name="tv-definition" select="imf:get-tagged-value($packages,'##CFG-TV-DEFINITION')"/>
 		<xsl:if test="not(empty(imf:get-tagged-value($packages,'##CFG-TV-DEFINITION')))">
 			<ep:definition>
-				<ep:p format="markdown" level="BSM">
-					<xsl:sequence select="imf:get-tagged-value($packages,'##CFG-TV-DEFINITION')" />
-				</ep:p>
+					<xsl:for-each select="$packages/imvert:tagged-values/imvert:tagged-value[@id='CFG-TV-DEFINITION']/imvert:value/html:body/html:p">
+						<ep:p format="{$packages/imvert:tagged-values/imvert:tagged-value[@id='CFG-TV-DEFINITION']/imvert:value/@format}" level="BSM">
+							<xsl:value-of select="."/>
+						</ep:p>
+						<xsl:if test="following-sibling::html:p">
+							<ep:p format="{$packages/imvert:tagged-values/imvert:tagged-value[@id='CFG-TV-DEFINITION']/imvert:value/@format}" level="BSM"/>
+						</xsl:if>
+					</xsl:for-each>
 			</ep:definition>
 		</xsl:if>
 	</xsl:variable>
@@ -78,16 +93,6 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="imf:get-tagged-value($packages,'##CFG-TV-SERIALISATION')"/>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:variable>
-	<xsl:variable name="description-level">
-		<xsl:choose>
-			<xsl:when test="empty(imf:get-tagged-value($packages,'##CFG-TV-INSERTDESCRIPTIONFROM'))">
-				<xsl:value-of select="'SIM'"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:value-of select="imf:get-tagged-value($packages,'##CFG-TV-INSERTDESCRIPTIONFROM')"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
@@ -182,7 +187,10 @@
 				<xsl:sequence select="imf:create-output-element('ep:release', $packages/imvert:release)" />
 				<xsl:sequence select="imf:create-output-element('ep:date', substring-before($packages/imvert:generated,'T'))" />
 				<xsl:sequence select="imf:create-output-element('ep:patch-number', $version)" />
-				<xsl:sequence select="imf:create-output-element('ep:documentation', $kv-definition,'',false(),false())" />
+				<ep:documentation>
+					<xsl:sequence select="$kv-definition"/>					
+				</ep:documentation>
+				<!--xsl:sequence select="imf:create-output-element('ep:documentation', $kv-definition,'',false(),false())" /-->
 
 				<xsl:sequence select="imf:track('Constructing the OpenAPI message constructs')" />
 
@@ -2576,16 +2584,19 @@
 	</xsl:function>
 	
 	<xsl:template match="html:*">
-		<xsl:copy>
+		<!--xsl:copy-->
+		<xsl:variable name="content">
 			<xsl:choose>
 				<xsl:when test="html:*">
 					<xsl:apply-templates select="html:*|text()"/>
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:value-of select="normalize-space(.)"/>
+					<xsl:value-of select="."/>
 				</xsl:otherwise>
 			</xsl:choose>
-		</xsl:copy>
+		</xsl:variable>
+		<xsl:value-of select="normalize-space($content)"/>
+		<!--/xsl:copy-->
 	</xsl:template>
 
 	<xsl:function name="imf:get-specific-compiled-tagged-values-up-to-level-debug">
@@ -2673,7 +2684,7 @@
 		</xsl:for-each> 
 		
 	</xsl:function>
-	
+
 	<xsl:function name="imf:capitalize">
 		<xsl:param name="name" />
 		<xsl:value-of select="concat(upper-case(substring($name,1,1)),substring($name,2))" />
