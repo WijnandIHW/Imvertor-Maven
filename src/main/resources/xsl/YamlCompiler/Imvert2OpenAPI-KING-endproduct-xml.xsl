@@ -2584,8 +2584,7 @@
 	</xsl:function>
 	
 	<xsl:template match="html:*">
-		<!--xsl:copy-->
-		<xsl:variable name="content">
+		<xsl:variable name="plain-content">
 			<xsl:choose>
 				<xsl:when test="html:*">
 					<xsl:apply-templates select="html:*|text()"/>
@@ -2595,8 +2594,7 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:value-of select="normalize-space($content)"/>
-		<!--/xsl:copy-->
+		<xsl:value-of select="normalize-space($plain-content)"/>
 	</xsl:template>
 
 	<xsl:function name="imf:get-specific-compiled-tagged-values-up-to-level-debug">

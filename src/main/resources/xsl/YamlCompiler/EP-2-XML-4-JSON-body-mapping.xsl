@@ -1509,7 +1509,8 @@
 						</xsl:when> -->
 						<xsl:otherwise>
 							<xsl:for-each select="ep:enum">
-								<xsl:value-of select="concat('\n* `',ep:alias,'` - ',ep:name,' ',ep:documentation)"/>
+								<xsl:text>
+</xsl:text><xsl:value-of select="concat('* `',ep:alias,'` - ',ep:name,' ',ep:documentation)"/>
 							</xsl:for-each>
 						</xsl:otherwise>
 					</xsl:choose>
@@ -2046,9 +2047,11 @@
 						<xsl:value-of select="ep:name"/>
 					</xsl:if>
 					<xsl:if test="parent::ep:choice">
-						<xsl:text>\nLink naar een van de volgende mogelijke typen </xsl:text><xsl:value-of select="$elementName"/><xsl:text>:</xsl:text>
+						<xsl:text>
+Link naar een van de volgende mogelijke typen </xsl:text><xsl:value-of select="$elementName"/><xsl:text>:</xsl:text>
 						<xsl:for-each select="../ep:construct">
-							<xsl:text>\n* </xsl:text><xsl:value-of select="ep:type-name"/>
+							<xsl:text>
+* </xsl:text><xsl:value-of select="ep:type-name"/>
 						</xsl:for-each>
 					</xsl:if>
 				</xsl:variable>
@@ -2407,57 +2410,36 @@
 			</xsl:if>
 		</xsl:variable>
 		
-		<xsl:sequence select="$completeDefinition"/>
-		<xsl:if test="not(empty($completeDefinition)) and not(empty($completeDescription))"><xsl:text>
-  </xsl:text><xsl:text>
+		<xsl:if test="not($completeDefinition = '')"><xsl:sequence select="$completeDefinition"/></xsl:if>
+		<xsl:if test="not($completeDefinition = '') and not($completeDescription = '')"><xsl:text>
+</xsl:text><xsl:text>
 </xsl:text></xsl:if>
-  		<xsl:sequence select="$completeDescription"/>
-		<xsl:if test="(not(empty($completeDescription)) and not(empty($completePattern))) or (not(empty($completeDefinition)) and not(empty($completePattern)))"><xsl:text>
-  </xsl:text><xsl:text>
+		<xsl:if test="not($completeDescription = '')"><xsl:sequence select="$completeDescription"/></xsl:if>
+		<xsl:if test="(not($completeDescription = '') and not($completePattern = '')) or (not($completeDefinition = '') and not($completePattern = ''))"><xsl:text>
+</xsl:text><xsl:text>
 </xsl:text></xsl:if>
-  		<xsl:sequence select="$completePattern"/>
+		<xsl:if test="not($completePattern = '')"><xsl:sequence select="$completePattern"/></xsl:if>
 	</xsl:template>
 	
-	<xsl:template match="ep:definition">
-		<xsl:variable name="SIM-definition">
+	<xsl:template match="ep:definition|ep:description">
+		<xsl:variable name="SIM-documentation">
 			<xsl:apply-templates select="ep:p[@level='SIM']"/>
 		</xsl:variable>
-		<xsl:variable name="UGM-definition">
+		<xsl:variable name="UGM-documentation">
 			<xsl:apply-templates select="ep:p[@level='UGM']"/>
 		</xsl:variable>
-		<xsl:variable name="BSM-definition">
+		<xsl:variable name="BSM-documentation">
 			<xsl:apply-templates select="ep:p[@level='BSM']"/>
 		</xsl:variable>
-		<xsl:sequence select="$SIM-definition"/>
-		<xsl:if test="not(empty($SIM-definition)) and not(empty($UGM-definition))"><xsl:text>
-  </xsl:text><xsl:text>
+		<xsl:if test="ep:p[@level='SIM']"><xsl:sequence select="$SIM-documentation"/></xsl:if>
+		<xsl:if test="ep:p[@level='SIM'] and ep:p[@level='UGM']"><xsl:text>
+</xsl:text><xsl:text>
 </xsl:text></xsl:if>
-		<xsl:sequence select="$UGM-definition"/>
-		<xsl:if test="(not(empty($UGM-definition)) and not(empty($BSM-definition))) or (not(empty($SIM-definition)) and not(empty($BSM-definition)))"><xsl:text>
-  </xsl:text><xsl:text>
+		<xsl:if test="ep:p[@level='UGM']"><xsl:sequence select="$UGM-documentation"/></xsl:if>
+		<xsl:if test="(ep:p[@level='UGM'] and ep:p[@level='BSM']) or (ep:p[@level='SIM'] and ep:p[@level='BSM'])"><xsl:text>
+</xsl:text><xsl:text>
 </xsl:text></xsl:if>
-		<xsl:sequence select="$BSM-definition"/>
-	</xsl:template>
-	
-	<xsl:template match="ep:description">
-		<xsl:variable name="SIM-description">
-			<xsl:apply-templates select="ep:p[@level='SIM']"/>
-		</xsl:variable>
-		<xsl:variable name="UGM-description">
-			<xsl:apply-templates select="ep:p[@level='UGM']"/>
-		</xsl:variable>
-		<xsl:variable name="BSM-description">
-			<xsl:apply-templates select="ep:p[@level='BSM']"/>
-		</xsl:variable>
-		<xsl:sequence select="$SIM-description"/>
-		<xsl:if test="not(empty($SIM-description)) and not(empty($UGM-description))"><xsl:text>
-  </xsl:text><xsl:text>
-</xsl:text></xsl:if>
-		<xsl:sequence select="$UGM-description"/>
-		<xsl:if test="(not(empty($UGM-description)) and not(empty($BSM-description))) or (not(empty($SIM-description)) and not(empty($BSM-description)))"><xsl:text>
-  </xsl:text><xsl:text>
-</xsl:text></xsl:if>
-		<xsl:sequence select="$BSM-description"/>
+		<xsl:if test="ep:p[@level='BSM']"><xsl:sequence select="$BSM-documentation"/></xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="ep:pattern">
@@ -2465,12 +2447,14 @@
 	</xsl:template>
 	
 	<xsl:template match="ep:p">
+		<xsl:variable name="level" select="@level"/>
 		<xsl:value-of select="normalize-space(translate(.,'&quot;','&#96;'))"/>
-		<xsl:if test="following-sibling::ep:p">
-			<xsl:text> </xsl:text>
+		<xsl:if test="following-sibling::ep:p[@level = $level]">
+			<xsl:text>
+</xsl:text>
 		</xsl:if>
 	</xsl:template>
-
+	
 	<xsl:function name="imf:determineIndicatorNonIdProperties">
 		<xsl:param name="type-name"/>
 		

@@ -2242,51 +2242,7 @@
 </xsl:text></xsl:if>
 		<xsl:if test="ep:p[@level='BSM']"><xsl:sequence select="$BSM-documentation"/></xsl:if>
 	</xsl:template>
-	
 
-
-<?x	<xsl:template match="ep:definition">
-		<xsl:variable name="SIM-definition">
-			<xsl:apply-templates select="ep:p[@level='SIM']"/>
-		</xsl:variable>
-		<xsl:variable name="UGM-definition">
-			<xsl:apply-templates select="ep:p[@level='UGM']"/>
-		</xsl:variable>
-		<xsl:variable name="BSM-definition">
-			<xsl:apply-templates select="ep:p[@level='BSM']"/>
-		</xsl:variable>
-		<xsl:if test="ep:p[@level='SIM']"><xsl:sequence select="$SIM-definition"/></xsl:if>
-		<xsl:if test="ep:p[@level='SIM'] and ep:p[@level='UGM']"><xsl:text>
-</xsl:text><xsl:text>
-</xsl:text></xsl:if>
-		<xsl:if test="ep:p[@level='UGM']"><xsl:sequence select="$UGM-definition"/></xsl:if>
-		<xsl:if test="(ep:p[@level='UGM'] and ep:p[@level='BSM']) or (ep:p[@level='SIM'] and ep:p[@level='BSM'])"><xsl:text>
-</xsl:text><xsl:text>
-</xsl:text></xsl:if>
-		<xsl:if test="ep:p[@level='BSM']"><xsl:sequence select="$BSM-definition"/></xsl:if>
-	</xsl:template>
-	
-	<xsl:template match="ep:description">
-		<xsl:variable name="SIM-description">
-			<xsl:apply-templates select="ep:p[@level='SIM']"/>
-		</xsl:variable>
-		<xsl:variable name="UGM-description">
-			<xsl:apply-templates select="ep:p[@level='UGM']"/>
-		</xsl:variable>
-		<xsl:variable name="BSM-description">
-			<xsl:apply-templates select="ep:p[@level='BSM']"/>
-		</xsl:variable>
-		<xsl:if test="ep:p[@level='SIM']"><xsl:sequence select="$SIM-description"/></xsl:if>
-		<xsl:if test="ep:p[@level='SIM'] and ep:p[@level='UGM']"><xsl:text>
-</xsl:text><xsl:text>
-</xsl:text></xsl:if>
-		<xsl:if test="ep:p[@level='UGM']"><xsl:sequence select="$UGM-description"/></xsl:if>
-		<xsl:if test="(ep:p[@level='UGM'] and ep:p[@level='BSM']) or (ep:p[@level='SIM'] and ep:p[@level='BSM'])"><xsl:text>
-</xsl:text><xsl:text>
-</xsl:text></xsl:if>
-		<xsl:if test="ep:p[@level='BSM']"><xsl:sequence select="$BSM-description"/></xsl:if>
-	</xsl:template> ?>
-	
 	<xsl:template match="ep:pattern">
 		<xsl:apply-templates select="ep:p"/>
 	</xsl:template>
