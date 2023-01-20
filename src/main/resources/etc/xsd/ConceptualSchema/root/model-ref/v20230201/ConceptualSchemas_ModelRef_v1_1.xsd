@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:Model-ref="http://www.imvertor.org/metamodels/conceptualschemas/model-ref/v20230201"
+           xmlns:imf="http://www.imvertor.org/xsl/functions"
+           xmlns:imvert="http://www.imvertor.org/schema/system"
+           xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+           xmlns:xlink="http://www.w3.org/1999/xlink"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://www.imvertor.org/metamodels/conceptualschemas/model-ref/v20230201"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.1-">
+   <xs:annotation>
+      <xs:appinfo source="http://www.imvertor.org/schema-info/uri">http://www.imvertor.org/metamodels/conceptualschemas/model-ref</xs:appinfo>
+      <xs:appinfo source="http://www.imvertor.org/schema-info/version">1.1</xs:appinfo>
+      <xs:appinfo source="http://www.imvertor.org/schema-info/release">20181210</xs:appinfo>
+      <xs:appinfo source="http://www.imvertor.org/schema-info/generated">2023-01-20T10:21:53Z</xs:appinfo>
+      <xs:appinfo source="http://www.imvertor.org/schema-info/generator">Nightly-build.3</xs:appinfo>
+      <xs:appinfo source="http://www.imvertor.org/schema-info/owner">Kadaster</xs:appinfo>
+      <xs:documentation source="http://www.imvertor.org/schema-info/file-location">ConceptualSchemas/model-ref/v20230201/ConceptualSchemas_ModelRef_v1_1.xsd</xs:documentation>
+      <xs:documentation source="http://www.imvertor.org/schema-info/conversion">
+        This schema is based on an UML specification, which is transformed by the Imvertor software. Imvertor modules are in the public domain, see http://www.imvertor.org.
+    </xs:documentation>
+   </xs:annotation>
+   <xs:import namespace="http://www.w3.org/1999/xlink"
+              schemaLocation="../../../xlink/1.0.0/xlinks.xsd"/>
+   <xs:element name="ConceptualSchemaRef"
+               type="Model-ref:ConceptualSchemaRef"
+               abstract="false"/>
+   <xs:complexType name="ConceptualSchemaRef" abstract="false">
+      <xs:simpleContent>
+         <xs:extension base="xs:string">
+            <xs:attribute ref="xlink:href" use="optional"/>
+         </xs:extension>
+      </xs:simpleContent>
+   </xs:complexType>
+   <xs:element name="MapRef" type="Model-ref:MapRef" abstract="false"/>
+   <xs:complexType name="MapRef" abstract="false">
+      <xs:simpleContent>
+         <xs:extension base="xs:string">
+            <xs:attribute ref="xlink:href" use="optional"/>
+         </xs:extension>
+      </xs:simpleContent>
+   </xs:complexType>
+</xs:schema>

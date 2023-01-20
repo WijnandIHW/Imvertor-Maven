@@ -181,6 +181,10 @@
                 <value default="yes">Conceptueel</value>
                 <value>Logisch</value>
             </declared-values>
+            <declared-values lang="en">
+                <value default="yes">Conceptual</value>
+                <value>Logical</value>
+            </declared-values>
         </tv>
         
         <tv norm="space" id="CFG-TV-IMRELATIONMODELINGTYPE">
@@ -197,6 +201,10 @@
             <declared-values lang="nl">
                 <value default="yes">Relatiesoort leidend</value>
                 <value>Relatierol leidend</value>
+            </declared-values>
+            <declared-values lang="en">
+                <value default="yes">Associationtype leading</value>
+                <value>Associationrole leading</value>
             </declared-values>
         </tv>
        
@@ -324,6 +332,10 @@
                 <value default="yes">NL</value>
                 <value>EN</value>
             </declared-values>
+            <declared-values lang="en">
+                <value default="yes">EN</value>
+                <value>NL</value>
+            </declared-values>
         </tv>
         
         <tv norm="space" id="CFG-TV-MIMVERSION">
@@ -337,7 +349,7 @@
             <stereotypes>
                 <stereo minmax="1..1">stereotype-name-informatiemodel-package</stereo>
             </stereotypes>
-            <declared-values lang="nl">
+            <declared-values lang="#all">
                 <value default="yes">1.1</value>
                 <value default="yes">1.1.0</value>
             </declared-values>
